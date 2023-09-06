@@ -1,26 +1,4 @@
 
-/*
-   Cyclic_Executive_example_Slide_25.c
-   demonstration of the principle of the cyclic executive
-
-   Using a switch & cases rather than cut and paste
-
-   This code has been checked with lint ( splint )
-   compiled with "picky compilation" ( -Wall -Wextra -Werror ) 
-   and re-foratted to 'gnu' format using "astyle"
-   
-   last edit: Wed 30 Aug 2023 00:22:27 ACST
-
-   for RTES Comp. Ex. 01 in Y2023
-
-   by Andrew A.
-
-   compilation advice:
-
-   gcc -Wall -Wextra -Werror -o Cyclic_Executive_example_Slide_25_V02 Cyclic_Executive_example_Slide_25_V02.c
-
-*/
-
 #include <stdio.h>     /* needed for printf() */
 #include <stdint.h>    /* defines some types, including: int64_t */
 #include <time.h>      /* needed for clock_gettime() and  CLOCK_MONOTONIC*/
@@ -31,27 +9,11 @@
 #define TIME_TICK 1000
 /* 1000 us un a ms*/
 
-//slide 29, 4 tasks on is split in half
-
-#define MAX_PHASES 2 
-#define MAX_PROCS  4
-
-//new C array, negative numbers are to be ignored in the computation. Splits into two phases.
-static int C[MAX_PHASES][MAX_PROCS] =
- {
-    { 1,  3,  2, 2},
-    {-1, -1, -1, 6},
- };
-
-static int count[]    = {0,0,0,0}; /* stores an internal state of each process, really just the execution count*/   
-static int phase[]    = {0,0,0,0}; /* stores an internal state of each process, really just the execution count*/
-static int maxPhase[] = {1,1,1,2};
-
 /* The target times step in multiples of "f" the minor-frame size, in micro seconds*/
 # define f (10*TIME_TICK)
 
 /* Define some time intervals in microseconds  */
-#define H (20*TIME_TICK)
+#define H (60*TIME_TICK)
 
 /* The number of tabs to use across the screen */
 #define TAB_STEP  7
@@ -59,6 +21,12 @@ static int maxPhase[] = {1,1,1,2};
 /* The number of times to complete the main loop*/
 #define n_loops 1
 
+/* Define some parameters for the pseudo-tasks */
+int C[] = {4, 4, 2} ; /* Computation times */
+int T[] = {10,20,60} ; /* Periods */
+
+static int count[]    = {0,0,0,0,0}; /* stores an internal state of each process, really just the execution count*/
+static int n_steps[]  = {1,1,1,1,1}; /* stores the number of steps that each process will take*/
 
 /* function definitions*/
 static void tab_space(int k);
@@ -105,12 +73,20 @@ int main(void)
                         task_simulation (0);
                         task_simulation (1);
                         task_simulation (2);
-                        task_simulation (3);
-                        break;
+                        break;                        
                     case 1:
+                    case 3:
+                    case 5:
+                        task_simulation (0);
+                        break;
+                    case 2:
+                    case 4:
                         task_simulation (0);
                         task_simulation (1);
-                        task_simulation (3);
+                        break;
+
+                    default:
+                        /* no action is required */
                         break;
                     }
                 /* possibly wait for the end of the current minor cycle, with a busy loop*/
@@ -146,16 +122,14 @@ static void task_simulation (int proc_no)
 
     int k;
 
-    for (k=0; k< 1; k++) /* we can repeat this a number of times, if required*/
+    for (k=0; k< n_steps[proc_no]; k++) /* we can repeat this a number of times, if required*/
         {
 
             /* update the count, for this proc_no */
             count[proc_no] =  count[proc_no] + 1 ;
 
-
-            if (phase[proc_no] >= maxPhase[proc_no]) {
-                phase[proc_no] = 0;
-            }
+            /* Display some results on the correct part of the screen */
+            //tab_space( TAB_STEP*proc_no);
 
             /* We can make the processes individual, and of arbitrary complexity, if required*/
             switch(proc_no)
@@ -174,7 +148,7 @@ static void task_simulation (int proc_no)
                     break;
                 case 4:
                     printf("T5:\t "); /* print a label */
-                    break;
+                    break;    
 
                 default:
                     printf("Fault!\n");
@@ -188,9 +162,7 @@ static void task_simulation (int proc_no)
             printf("%d\t", count[proc_no]); /* the number of the instance of this task */
             printf("%ld\t",(long) elapsed_time()); /* The starting time for this task*/
 
-	        (void) usleep((useconds_t) (C[phase[proc_no]][proc_no]*SHORT_TIME_TICK) );
-            phase[proc_no]++;
-
+	    (void) usleep((useconds_t) (C[proc_no]*SHORT_TIME_TICK) );
 	    /* sleep for the required number of time ticks, to simulate work*/
 	    /* This virtual work cannot be interrupted. It will run to completion.*/
 

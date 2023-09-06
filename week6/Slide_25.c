@@ -1,26 +1,4 @@
 
-/*
-   Cyclic_Executive_example_Slide_25.c
-   demonstration of the principle of the cyclic executive
-
-   Using a switch & cases rather than cut and paste
-
-   This code has been checked with lint ( splint )
-   compiled with "picky compilation" ( -Wall -Wextra -Werror ) 
-   and re-foratted to 'gnu' format using "astyle"
-   
-   last edit: Wed 30 Aug 2023 00:22:27 ACST
-
-   for RTES Comp. Ex. 01 in Y2023
-
-   by Andrew A.
-
-   compilation advice:
-
-   gcc -Wall -Wextra -Werror -o Cyclic_Executive_example_Slide_25_V02 Cyclic_Executive_example_Slide_25_V02.c
-
-*/
-
 #include <stdio.h>     /* needed for printf() */
 #include <stdint.h>    /* defines some types, including: int64_t */
 #include <time.h>      /* needed for clock_gettime() and  CLOCK_MONOTONIC*/
@@ -30,21 +8,6 @@
 /* Say, one millisecond per time tick, get everything done quickly... */
 #define TIME_TICK 1000
 /* 1000 us un a ms*/
-
-/*
-Description of the tasks from the lecture slides:
-
-Example slide 25
-   2 tasks, N=2 (n_proc)
-
-   T1 = (1, 4);Tue Aug 29 12:29:16 ACST 2023
-   T2 = (2, 6);
-
-H = lcm(4,6) = 12
-f >= max(1,2) = 2
-f <= min(4,6) = 4
-possible f values { 2, 3, 4 }
-*/
 
 /* The target times step in multiples of "f" the minor-frame size, in micro seconds*/
 # define f (2*TIME_TICK)

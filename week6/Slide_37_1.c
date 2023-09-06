@@ -32,7 +32,7 @@
 /* 1000 us un a ms*/
 
 /* The target times step in multiples of "f" the minor-frame size, in micro seconds*/
-# define f (10*TIME_TICK)
+# define f (20*TIME_TICK)
 
 /* Define some time intervals in microseconds  */
 #define H (400*TIME_TICK)
@@ -88,27 +88,48 @@ int main(void)
     for ( k=1; k<=n_loops; k++ )
         for(j=0; j<N_frames; j++)
             {
-
-                if (j % 2 == 0) {
-                    task_simulation (0);
-                }
-
-                if (j % 4 == 0) {
-                    task_simulation (1);
-                }
-
-                if (j % 8 == 0) {
-                    task_simulation (2);
-                }
-
-                if (j % 8 == 1) {
-                    task_simulation (3);
-                }   
-
-                if (j % 20 == 1) {
-                    task_simulation (4);
-                }
-
+                /* simulate the activities for this minor cycle, or "frame" */
+                task_simulation (0); //happens every cycle;
+                switch(j)
+                    {
+                    case 0:
+                    case 4:
+                    case 8:
+                    case 19:
+                        task_simulation (1);
+                        task_simulation (2);
+                        break;
+                    case 1:
+                    case 11:
+                        task_simulation (3);
+                        break;
+                    case 2:
+                        task_simulation (1);
+                        task_simulation (4);
+                        break;
+                    case 6:
+                        task_simulation (1);
+                        task_simulation (3);
+                        break;
+                    case 10:
+                    case 14:
+                    case 18:
+                        task_simulation (1);
+                        break;
+                    case 16:
+                        task_simulation (1);
+                        task_simulation (2);
+                        task_simulation (3);
+                        break;
+                    case 12:
+                        task_simulation (1);
+                        task_simulation (2);
+                        task_simulation (4);
+                        break;
+                    default:
+                        /* no action is required */
+                        break;
+                    }
                 /* possibly wait for the end of the current minor cycle, with a busy loop*/
                 while (elapsed_time() < target_time ) l++ ;
                 target_time = target_time +(f*1000); /* Time at the end of the next minor frame */
